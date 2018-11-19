@@ -305,11 +305,11 @@ func TestInterpretMany(t *testing.T) {
 		fail  bool
 		graph *pgraph.Graph
 	}
-	values := []test{}
+	testCases := []test{}
 
 	{
 		graph, _ := pgraph.NewGraph("g")
-		values = append(values, test{ // 0
+		testCases = append(testCases, test{ // 0
 			"nil",
 			``,
 			false,
@@ -318,7 +318,7 @@ func TestInterpretMany(t *testing.T) {
 	}
 	{
 		graph, _ := pgraph.NewGraph("g")
-		values = append(values, test{ // 1
+		testCases = append(testCases, test{ // 1
 			name:  "empty",
 			code:  ``,
 			fail:  false,
@@ -332,7 +332,7 @@ func TestInterpretMany(t *testing.T) {
 		i := int64(42 + 13)
 		x.Int64Ptr = &i
 		graph.AddVertex(x)
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "simple addition",
 			code: `
 				test "t" {
@@ -350,7 +350,7 @@ func TestInterpretMany(t *testing.T) {
 		i := int64(42 + 13 + 99)
 		x.Int64Ptr = &i
 		graph.AddVertex(x)
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "triple addition",
 			code: `
 				test "t" {
@@ -368,7 +368,7 @@ func TestInterpretMany(t *testing.T) {
 		i := int64(42 + 13 - 99)
 		x.Int64Ptr = &i
 		graph.AddVertex(x)
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "triple addition/subtraction",
 			code: `
 				test "t" {
@@ -386,7 +386,7 @@ func TestInterpretMany(t *testing.T) {
 		s1 := "hello"
 		x1.StringPtr = &s1
 		graph.AddVertex(x1)
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "single include",
 			code: `
 			class c1($a, $b) {
@@ -410,7 +410,7 @@ func TestInterpretMany(t *testing.T) {
 		x1.StringPtr = &s1
 		x2.StringPtr = &s2
 		graph.AddVertex(x1, x2)
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "double include",
 			code: `
 			class c1($a, $b) {
@@ -435,7 +435,7 @@ func TestInterpretMany(t *testing.T) {
 		//x1.StringPtr = &s1
 		//x2.Int64Ptr = &i2
 		//graph.AddVertex(x1, x2)
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "double include different types error",
 			code: `
 			class c1($a, $b) {
@@ -466,7 +466,7 @@ func TestInterpretMany(t *testing.T) {
 		x1.StringPtr = &s1
 		x2.StringPtr = &s2
 		graph.AddVertex(x1, x2)
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "double include different types allowed",
 			code: `
 			class c1($a, $b) {
@@ -494,7 +494,7 @@ func TestInterpretMany(t *testing.T) {
 	//	x1.StringPtr = &s1
 	//	x2.StringPtr = &s2
 	//	graph.AddVertex(x1, x2)
-	//	values = append(values, test{
+	//	testCases = append(testCases, test{
 	//		name: "double include different printf types allowed",
 	//		code: `
 	//		class c1($a, $b) {
@@ -519,7 +519,7 @@ func TestInterpretMany(t *testing.T) {
 		x1.StringPtr = &s1
 		x2.StringPtr = &s2
 		graph.AddVertex(x1, x2)
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "double include with variable in parent scope",
 			code: `
 			$foo = "hey"
@@ -545,7 +545,7 @@ func TestInterpretMany(t *testing.T) {
 		x1.StringPtr = &s1
 		x2.StringPtr = &s2
 		graph.AddVertex(x1, x2)
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "double include with out of order variable in parent scope",
 			code: `
 			include c1("t1")
@@ -568,7 +568,7 @@ func TestInterpretMany(t *testing.T) {
 		s1 := "hello"
 		x1.StringPtr = &s1
 		graph.AddVertex(x1)
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "duplicate include identical",
 			code: `
 			include c1("t1", "hello")
@@ -590,7 +590,7 @@ func TestInterpretMany(t *testing.T) {
 		s1 := "hello"
 		x1.StringPtr = &s1
 		graph.AddVertex(x1)
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "duplicate include non-identical",
 			code: `
 			include c1("t1", "hello")
@@ -612,7 +612,7 @@ func TestInterpretMany(t *testing.T) {
 		})
 	}
 	{
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "duplicate include incompatible",
 			code: `
 			include c1("t1", "hello")
@@ -627,7 +627,7 @@ func TestInterpretMany(t *testing.T) {
 		})
 	}
 	{
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "class wrong number of args 1",
 			code: `
 			include c1("hello") # missing second arg
@@ -641,7 +641,7 @@ func TestInterpretMany(t *testing.T) {
 		})
 	}
 	{
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "class wrong number of args 2",
 			code: `
 			include c1("hello", 42) # added second arg
@@ -664,7 +664,7 @@ func TestInterpretMany(t *testing.T) {
 		x1.StringPtr = &s1
 		x2.StringPtr = &s2
 		graph.AddVertex(x1, x2)
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "nested classes 1",
 			code: `
 			include c1("t1", "hello") # test["t1"] -> hello is 42
@@ -690,7 +690,7 @@ func TestInterpretMany(t *testing.T) {
 		})
 	}
 	{
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "nested classes out of scope 1",
 			code: `
 			include c1("t1", "hello") # test["t1"] -> hello is 42
@@ -717,7 +717,7 @@ func TestInterpretMany(t *testing.T) {
 	// TODO: recursive classes are not currently supported (should they be?)
 	//{
 	//	graph, _ := pgraph.NewGraph("g")
-	//	values = append(values, test{
+	//	testCases = append(testCases, test{
 	//		name: "recursive classes 0",
 	//		code: `
 	//		include c1(0) # start at zero
@@ -739,7 +739,7 @@ func TestInterpretMany(t *testing.T) {
 	//	s0 := "count is 3"
 	//	x0.StringPtr = &s0
 	//	graph.AddVertex(x0)
-	//	values = append(values, test{
+	//	testCases = append(testCases, test{
 	//		name: "recursive classes 1",
 	//		code: `
 	//		$max = 3
@@ -776,7 +776,7 @@ func TestInterpretMany(t *testing.T) {
 	//	x2.StringPtr = &s2
 	//	x3.StringPtr = &s3
 	//	graph.AddVertex(x0, x1, x2, x3)
-	//	values = append(values, test{
+	//	testCases = append(testCases, test{
 	//		name: "recursive classes 2",
 	//		code: `
 	//		include c1("ix", 3)
@@ -803,7 +803,7 @@ func TestInterpretMany(t *testing.T) {
 	//}
 	// TODO: remove this test if we ever support recursive classes
 	{
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "recursive classes fail 1",
 			code: `
 			$max = 3
@@ -823,7 +823,7 @@ func TestInterpretMany(t *testing.T) {
 	}
 	// TODO: remove this test if we ever support recursive classes
 	{
-		values = append(values, test{
+		testCases = append(testCases, test{
 			name: "recursive classes fail 2",
 			code: `
 			$max = 5
@@ -852,8 +852,8 @@ func TestInterpretMany(t *testing.T) {
 	}
 
 	names := []string{}
-	for index, test := range values { // run all the tests
-		name, code, fail, exp := test.name, test.code, test.fail, test.graph
+	for index, tc := range testCases { // run all the tests
+		name, code, fail, exp := tc.name, tc.code, tc.fail, tc.graph
 
 		if name == "" {
 			name = "<sub test not named>"
@@ -865,7 +865,7 @@ func TestInterpretMany(t *testing.T) {
 		names = append(names, name)
 
 		//if index != 3 { // hack to run a subset (useful for debugging)
-		//if test.name != "nil" {
+		//if tc.name != "nil" {
 		//	continue
 		//}
 
